@@ -11,7 +11,7 @@ pipeline {
 
         stage('Build Backend Image') {
             steps {
-                sh 'docker build -t backend-app CC_LAB-6/backend'
+                sh 'docker build -t backend-app backend'
             }
         }
 
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f nginx-lb || true
-                docker run -d --name nginx-lb -p 80:80 -v $(pwd)/CC_LAB-6/nginx/default.conf:/etc/nginx/nginx.conf nginx
+                docker run -d --name nginx-lb -p 80:80 -v $(pwd)/nginx/default.conf:/etc/nginx/nginx.conf nginx
                 '''
             }
         }
