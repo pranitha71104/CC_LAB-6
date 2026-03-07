@@ -29,7 +29,9 @@ pipeline {
             steps {
                 sh '''
                 docker rm -f nginx-lb || true
-                docker run -d --name nginx-lb -p 80:80 -v $(pwd)/nginx/default.conf:/etc/nginx/nginx.conf nginx
+                docker run -d --name nginx-lb -p 80:80 \
+                -v $(pwd)/nginx/default.conf:/etc/nginx/conf.d/default.conf \
+                nginx
                 '''
             }
         }
@@ -39,5 +41,6 @@ pipeline {
                 echo 'Pipeline executed successfully. NGINX load balancer is running.'
             }
         }
+
     }
 }
