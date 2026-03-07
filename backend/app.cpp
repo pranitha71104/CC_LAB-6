@@ -1,7 +1,10 @@
 #include <iostream>
-using namespace std;
+#include <unistd.h>
 
 int main() {
-    cout << "Hello from Dockerized C++ backend!" << endl;
+    while (true) {
+        std::cout << "Served by backend: " << getpid() << std::endl;
+        sleep(5);
+    }
     return 0;
 }
