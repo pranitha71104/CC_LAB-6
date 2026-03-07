@@ -1,24 +1,46 @@
-stage('Deploy Backends') {
-    steps {
-        sh '''
-        docker network create lab6-net || true
-        docker rm -f backend1 backend2 || true
-        docker run -d --name backend1 --network lab6-net backend-app
-        docker run -d --name backend2 --network lab6-net backend-app
-        '''
-    }
-}
+pipeline {
+    agent any
 
-stage('Deploy NGINX Load Balancer') {
-    steps {
-        sh '''
-        docker rm -f nginx-lb || true
+    stages {
 
-        docker run -d --name nginx-lb -p 80:80 --network lab6-net nginx
+        stage('Checkout SCM') {
+            steps {
+                echo 'Checking out source code'
+            }
+        }
 
-        docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+        stage('Build Backend Image') {
+            steps {
+                sh 'docker build -t backend-app backend'
+            }
+        }
 
-        docker exec nginx-lb nginx -s reload
-        '''
+        stage('Deploy Backends') {
+            steps {
+                sh '''
+                docker network create lab6-net || true
+                docker rm -f backend1 backend2 || true
+                docker run -d --name backend1 --network lab6-net backend-app
+                docker run -d --name backend2 --network lab6-net backend-app
+                '''
+            }
+        }
+
+        stage('Deploy NGINX Load Balancer') {
+            steps {
+                sh '''
+                docker rm -f nginx-lb || true
+
+                docker run -d --name nginx-lb \
+                --network lab6-net \
+                -p 80:80 nginx
+
+                docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+
+                docker exec nginx-lb nginx -s reload
+                '''
+            }
+        }
+
     }
 }
